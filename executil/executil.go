@@ -3,6 +3,7 @@ package executil
 import (
 	"os/exec"
 	"bytes"
+	"io"
 )
 
 // If the program dies, we need to shutdown gracefully. This channel is
@@ -140,6 +141,57 @@ func CheckExec(command string, commandLine ...string) error {
 	select {
 	case err := <-doneCh:
 		if err != nil {
+			return err
+		}
+	case <-interruptCh:
+		cmd.Process.Kill()
+		return newErrProcess("Interrupted by external request", command, commandLine, nil)
+	}
+
+	return nil
+}
+
+// Checks for successful execution. Logs all output at default level. Writes
+// the supplied string to stdin of the process.
+func CheckExecWithInput(input string, command string, commandLine ...string) error {
+	//log.Debugln("Executing Command:", command, commandLine)
+	cmd := exec.Command(command, commandLine...)
+
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		return err
+	}
+	defer stdin.Close()
+
+	//cmd.Stdout = NewLogWriter(log.With("pipe", "stdout").With("cmd", command).Debugln)
+	//cmd.Stderr = NewLogWriter(log.With("pipe", "stderr").With("cmd", command).Debugln)
+
+	if err := cmd.Start(); err != nil {
+		return err
+	}
+
+	// Wait on a go-routine for the process to exit
+	doneCh := make(chan error)
+	go func() {
+		doneCh <- cmd.Wait()
+	}()
+
+	stdinWriteCompleteCh := make(chan error)
+
+	go func() {
+		_, err := io.WriteString(stdin, input)
+		stdinWriteCompleteCh <- err
+		close(stdinWriteCompleteCh)
+	}()
+
+	// Wait for process exit or global interrupt
+	select {
+	case err := <-doneCh:
+		if err != nil {
+			return err
+		}
+		// Read the results of writing stdin
+		if werr := <-stdinWriteCompleteCh ; werr != nil {
 			return err
 		}
 	case <-interruptCh:
