@@ -63,6 +63,9 @@ func CheckExecWithOutput(command string, commandLine ...string) (string, string,
 	//cmd.Stderr = io.MultiWriter(stderrBuffer,
 	//	NewLogWriter(log.With("pipe", "stderr").With("cmd", command).Debugln))
 
+	cmd.Stdout = stdoutBuffer
+	cmd.Stderr = stderrBuffer
+
 	if err := cmd.Start(); err != nil {
 		return "", "", err
 	}
@@ -77,11 +80,11 @@ func CheckExecWithOutput(command string, commandLine ...string) (string, string,
 	select {
 	case err := <-doneCh:
 		if err != nil {
-			return "", "", err
+			return stdoutBuffer.String(), stderrBuffer.String(), err
 		}
 	case <-interruptCh:
 		cmd.Process.Kill()
-		return "", "", newErrProcess("Interrupted by external request", command, commandLine, nil)
+		return stdoutBuffer.String(), stderrBuffer.String(), newErrProcess("Interrupted by external request", command, commandLine, nil)
 	}
 
 	return stdoutBuffer.String(), stderrBuffer.String(), nil
@@ -200,6 +203,63 @@ func CheckExecWithInput(input string, command string, commandLine ...string) err
 	}
 
 	return nil
+}
+
+func CheckExecWithInputAndOutput(input string, command string, commandLine ...string) (string, string, error) {
+	//log.Debugln("Executing Command:", command, commandLine)
+	cmd := exec.Command(command, commandLine...)
+
+	stdin, err := cmd.StdinPipe()
+	if err != nil {
+		return "", "", err
+	}
+	defer stdin.Close()
+
+	stdoutBuffer := new(bytes.Buffer)
+	stderrBuffer := new(bytes.Buffer)
+
+	//cmd.Stdout = io.MultiWriter(stdoutBuffer,
+	//	NewLogWriter(log.With("pipe", "stdout").With("cmd", command).Debugln))
+	//cmd.Stderr = io.MultiWriter(stderrBuffer,
+	//	NewLogWriter(log.With("pipe", "stderr").With("cmd", command).Debugln))
+
+	cmd.Stdout = stdoutBuffer
+	cmd.Stderr = stderrBuffer
+
+	if err := cmd.Start(); err != nil {
+		return "", "", err
+	}
+
+	// Wait on a go-routine for the process to exit
+	doneCh := make(chan error)
+	go func() {
+		doneCh <- cmd.Wait()
+	}()
+
+	stdinWriteCompleteCh := make(chan error)
+
+	go func() {
+		_, err := io.WriteString(stdin, input)
+		stdinWriteCompleteCh <- err
+		close(stdinWriteCompleteCh)
+	}()
+
+	// Wait for process exit or global interrupt
+	select {
+	case err := <-doneCh:
+		if err != nil {
+			return stdoutBuffer.String(), stderrBuffer.String(), err
+		}
+		// Read the results of writing stdin
+		if werr := <-stdinWriteCompleteCh ; werr != nil {
+			return stdoutBuffer.String(), stderrBuffer.String(), werr
+		}
+	case <-interruptCh:
+		cmd.Process.Kill()
+		return stdoutBuffer.String(), stderrBuffer.String(), newErrProcess("Interrupted by external request", command, commandLine, nil)
+	}
+
+	return stdoutBuffer.String(), stderrBuffer.String(), nil
 }
 
 func MustExecWithOutput(command string, commandLine ...string) (string, string) {
