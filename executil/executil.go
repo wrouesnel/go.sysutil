@@ -183,6 +183,9 @@ func CheckExecWithInput(input string, command string, commandLine ...string) err
 
 	go func() {
 		_, err := io.WriteString(stdin, input)
+		// Always close the buffer otherwise the subprocess may not unblock,
+		// which deadlocks us because we don't read the write channel.
+		stdin.Close()
 		stdinWriteCompleteCh <- err
 		close(stdinWriteCompleteCh)
 	}()
@@ -240,6 +243,9 @@ func CheckExecWithInputAndOutput(input string, command string, commandLine ...st
 
 	go func() {
 		_, err := io.WriteString(stdin, input)
+		// Always close the buffer otherwise the subprocess may not unblock,
+		// which deadlocks us because we don't read the write channel.
+		stdin.Close()
 		stdinWriteCompleteCh <- err
 		close(stdinWriteCompleteCh)
 	}()
