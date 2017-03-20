@@ -1,0 +1,57 @@
+{
+	"comment": "",
+	"ignore": "test",
+	"package": [
+		{
+			"checksumSHA1": "4SfCbidrEn2RihuuHseZSo+ez3U=",
+			"path": "github.com/golang/lint",
+			"revision": "cb00e5669539f047b2f4c53a421a01b0c8e172c6",
+			"revisionTime": "2017-02-28T16:30:50-05:00",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "cdOCt0Yb+hdErz8NAQqayxPmRsY=",
+			"path": "github.com/hashicorp/errwrap",
+			"revision": "7554cd9344cec97297fa6649b055a8c98c2a1e55",
+			"revisionTime": "2014-10-27T22:47:10-07:00"
+		},
+		{
+			"checksumSHA1": "6nmAJBw2phU9MUmkUnqFvbO5urg=",
+			"path": "github.com/kardianos/osext",
+			"revision": "29ae4ffbc9a6fe9fb2bc5029050ce6996ea1d3bc",
+			"revisionTime": "2015-12-22T07:32:29-08:00"
+		},
+		{
+			"checksumSHA1": "ih4CCYD19rjjF9fjid+l7w/+cIg=",
+			"path": "github.com/wadey/gocovmerge",
+			"revision": "b5bfa59ec0adc420475f97f89b58045c721d761c",
+			"revisionTime": "2016-03-31T14:18:00-04:00",
+			"tree": true
+		},
+		{
+			"checksumSHA1": "O5eYI3n1WdaC30AxQjETe3dAQHU=",
+			"path": "golang.org/x/tools/cover",
+			"revision": "2946dd1f77e693e136d9ed202ba093bb4a3ea761",
+			"revisionTime": "2017-03-15T15:55:52-07:00"
+		},
+		{
+			"checksumSHA1": "SPhG159tk5yX2NfanAXpSAL3fVY=",
+			"path": "golang.org/x/tools/go/gcexportdata",
+			"revision": "2946dd1f77e693e136d9ed202ba093bb4a3ea761",
+			"revisionTime": "2017-03-15T15:55:52-07:00"
+		},
+		{
+			"checksumSHA1": "RshKAgPgkcIQOY45/b2XaCji2iY=",
+			"path": "golang.org/x/tools/go/gcimporter15",
+			"revision": "2946dd1f77e693e136d9ed202ba093bb4a3ea761",
+			"revisionTime": "2017-03-15T15:55:52-07:00"
+		},
+		{
+			"checksumSHA1": "CEFTYXtWmgSh+3Ik1NmDaJcz4E0=",
+			"path": "gopkg.in/check.v1",
+			"revision": "20d25e2804050c1cd24a7eea1e7a6447dd0e74ec",
+			"revisionTime": "2016-12-08T12:13:25-06:00"
+		}
+	],
+	"rootPath": "github.com/wrouesnel/go.sysutil"
+}

@@ -1,26 +1,25 @@
 package fsutil
 
 import (
-	"fmt"
-	"os"
 	"io/ioutil"
+	"os"
 )
 
 // ErrPath is returned as the panic() context when a Must function is invoked
 // as a wrapped error..
 type ErrTemporaryFile struct {
 	message string
-	dir string
-	prefix string
-	err error
+	dir     string
+	prefix  string
+	err     error
 }
 
 func newErrTemporaryFile(message string, dir string, prefix string, err error) *ErrTemporaryFile {
 	return &ErrTemporaryFile{
 		message: message,
-		prefix: prefix,
-		dir: dir,
-		err: err,
+		prefix:  prefix,
+		dir:     dir,
+		err:     err,
 	}
 }
 

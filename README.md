@@ -1,3 +1,7 @@
+[![Build Status](https://travis-ci.org/wrouesnel/go.sysutil.svg?branch=master)](https://travis-ci.org/wrouesnel/go.sysutil)
+[![Coverage Status](https://coveralls.io/repos/github/wrouesnel/go.sysutil/badge.svg?branch=master)](https://coveralls.io/github/wrouesnel/go.sysutil?branch=master)
+[![Go Report Card](https://goreportcard.com/badge/github.com/wrouesnel/go.sysutil)](https://goreportcard.com/report/github.com/wrouesnel/go.sysutil)
+
 # System programming utility libraries for Golang
 
 This repository is a collection of useful functions I find myself

@@ -1,9 +1,9 @@
 package executil
 
 import (
-	"os/exec"
 	"bytes"
 	"io"
+	"os/exec"
 )
 
 // If the program dies, we need to shutdown gracefully. This channel is
@@ -27,7 +27,7 @@ func Interrupt() {
 type ErrProcess struct {
 	message string
 
-	command string
+	command     string
 	commandLine []string
 
 	innerError error
@@ -35,10 +35,10 @@ type ErrProcess struct {
 
 func newErrProcess(message string, command string, commandLine []string, innerError error) *ErrProcess {
 	return &ErrProcess{
-		message: message,
-		command: command,
+		message:     message,
+		command:     command,
 		commandLine: commandLine,
-		innerError: innerError,
+		innerError:  innerError,
 	}
 }
 
@@ -197,7 +197,7 @@ func CheckExecWithInput(input string, command string, commandLine ...string) err
 			return err
 		}
 		// Read the results of writing stdin
-		if werr := <-stdinWriteCompleteCh ; werr != nil {
+		if werr := <-stdinWriteCompleteCh; werr != nil {
 			return err
 		}
 	case <-interruptCh:
@@ -257,7 +257,7 @@ func CheckExecWithInputAndOutput(input string, command string, commandLine ...st
 			return stdoutBuffer.String(), stderrBuffer.String(), err
 		}
 		// Read the results of writing stdin
-		if werr := <-stdinWriteCompleteCh ; werr != nil {
+		if werr := <-stdinWriteCompleteCh; werr != nil {
 			return stdoutBuffer.String(), stderrBuffer.String(), werr
 		}
 	case <-interruptCh:

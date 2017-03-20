@@ -1,8 +1,8 @@
 package logutil
 
 import (
-	"io"
 	"bytes"
+	"io"
 )
 
 type LogWriter struct {

@@ -1,23 +1,27 @@
 package fsutil
 
 import (
+	"errors"
+	"github.com/hashicorp/errwrap"
 	"github.com/kardianos/osext"
 	"os"
 	"os/exec"
 )
 
-// ErrPath is returned as the panic() context when a Must function is invoked
-// as a wrapped error..
+var (
+	errCouldNotGetExecutableFolder = errors.New("could not get executable folder")
+)
+
 type ErrPath struct {
 	message string
-	path string
+	path    string
 }
 
-func newErrPath(message string, path string) *ErrPath {
-	return &ErrPath{
+func newErrPath(message string, path string) error {
+	return error(&ErrPath{
 		message: message,
-		path: path,
-	}
+		path:    path,
+	})
 }
 
 func (this ErrPath) WrappedErrors() []error {
@@ -37,7 +41,7 @@ func MustLookupPaths(paths ...string) {
 	for _, path := range paths {
 		_, err := exec.LookPath(path)
 		if err != nil {
-			panic(newErrPath("Could not find path", path))
+			panic(newErrPath("path is not present in executable PATH", path))
 		}
 	}
 
@@ -47,7 +51,7 @@ func MustLookupPaths(paths ...string) {
 func MustPathExist(paths ...string) {
 	for _, path := range paths {
 		if !PathExists(path) {
-			panic(newErrPath("Cannot continue", nil))
+			panic(newErrPath("path does not exist but must", path))
 		}
 	}
 }
@@ -56,7 +60,7 @@ func MustPathExist(paths ...string) {
 func MustPathNotExist(paths ...string) {
 	for _, path := range paths {
 		if PathExists(path) {
-			panic(newErrPath("Cannot continue", nil))
+			panic(newErrPath("path exists but musn't", path))
 		}
 	}
 }
@@ -81,7 +85,7 @@ func PathNotExist(path string) bool {
 func MustExecutableFolder() string {
 	folder, err := osext.ExecutableFolder()
 	if err != nil {
-		panic(newErrPath("Could not get executable folder", err))
+		panic(errCouldNotGetExecutableFolder)
 	}
 	return folder
 }
@@ -97,7 +101,7 @@ func GetFilePerms(filename string) (os.FileMode, error) {
 func MustGetFileSize(filename string) int64 {
 	size, err := GetFileSize(filename)
 	if err != nil {
-		panic(newErrPath("Could not get file size", err))
+		panic(err)
 	}
 	return size
 }
@@ -105,7 +109,7 @@ func MustGetFileSize(filename string) int64 {
 func GetFileSize(filename string) (int64, error) {
 	st, err := os.Stat(filename)
 	if err != nil {
-		return 0, err
+		return 0, errwrap.Wrap(newErrPath("could not get file size", filename), err)
 	}
 	return st.Size(), nil
 }
